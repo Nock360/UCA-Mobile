@@ -24,15 +24,15 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Select latest Xcode
+      - name: Select Xcode 26.0
         run: |
-          LATEST_XCODE=$(ls -d /Applications/Xcode*.app | sort -V | tail -n 1)
-          sudo xcode-select -s "$LATEST_XCODE"
+          XCODE_26=$(ls -d /Applications/Xcode_26.0*.app 2>/dev/null | head -n 1)
+          if [ -n "$XCODE_26" ]; then sudo xcode-select -s "$XCODE_26"; fi
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - run: sudo dotnet workload restore ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj
-      - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64
+      - run: dotnet workload install ios
+      - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64 -p:SkipXcodeVersionCheck=true
       - name: Pack IPA
         run: |
           mkdir -p Payload
