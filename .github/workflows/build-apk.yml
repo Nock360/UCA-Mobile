@@ -1,0 +1,35 @@
+﻿name: Build UCA Mobile (Android APK & iOS)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet workload install android
+      - run: dotnet publish ./UCA_Mobile.Android/UCA_Mobile.Android.csproj -c Release -f net10.0-android -p:AndroidPackageFormat=apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UCA_Mobile_Android_APK
+          path: ./UCA_Mobile.Android/bin/Release/net10.0-android/**/*-Signed.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet workload install ios
+      - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios /p:EnableCodeSigning=false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UCA_Mobile_iOS_App
+          path: ./UCA_Mobile.iOS/bin/Release/net10.0-ios/**/*

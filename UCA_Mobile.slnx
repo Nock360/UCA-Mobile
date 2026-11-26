@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Project Path="UCA_Mobile.Android/UCA_Mobile.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="UCA_Mobile.Browser/UCA_Mobile.Browser.csproj" />
+  <Project Path="UCA_Mobile.Desktop/UCA_Mobile.Desktop.csproj" />
+  <Project Path="UCA_Mobile.iOS/UCA_Mobile.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="UCA_Mobile/UCA_Mobile.csproj" />
+</Solution>
