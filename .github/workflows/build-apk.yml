@@ -1,4 +1,4 @@
-﻿name: Build UCA Mobile (Android APK & iOS)
+﻿name: Build UCA Mobile (Android APK & iOS IPA)
 
 on:
   push:
@@ -27,9 +27,14 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - run: dotnet workload install ios
-      - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios /p:EnableCodeSigning=false
+      - run: sudo dotnet workload install ios
+      - run: dotnet publish ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64 /p:EnableCodeSigning=false /p:CodesignKey="" /p:CodesignProvision=""
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -r ./UCA_Mobile.iOS/bin/Release/net10.0-ios/ios-arm64/publish/*.app Payload/
+          zip -r UCA_Mobile.ipa Payload
       - uses: actions/upload-artifact@v4
         with:
-          name: UCA_Mobile_iOS_App
-          path: ./UCA_Mobile.iOS/bin/Release/net10.0-ios/**/*
+          name: UCA_Mobile_iOS_IPA
+          path: ./UCA_Mobile.ipa
