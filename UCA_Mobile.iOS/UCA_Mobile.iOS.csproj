@@ -15,10 +15,12 @@
   </ItemGroup>
   <PropertyGroup>
     <EnableCodeSigning>false</EnableCodeSigning>
+    <_SkipXcodeVersionCheck>true</_SkipXcodeVersionCheck>
     <CodesignRequireProvisioningProfile>false</CodesignRequireProvisioningProfile>
     <_RequireCodeSigning>false</_RequireCodeSigning>
   </PropertyGroup>
   
 </Project>
+
 
 
