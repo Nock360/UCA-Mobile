@@ -1,4 +1,4 @@
-﻿name: Build UCA Mobile (Android APK & iOS IPA)
+﻿name: Build UCA Mobile (Android & iOS)
 
 on:
   push:
@@ -24,12 +24,16 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Select latest Xcode
+        run: |
+          LATEST_XCODE=$(ls -d /Applications/Xcode*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$LATEST_XCODE"
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - run: sudo dotnet workload install ios
-      - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64 -p:EnableCodeSigning=false -p:_RequireCodeSigning=false
-      - name: Package IPA
+      - run: sudo dotnet workload restore ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj
+      - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64
+      - name: Pack IPA
         run: |
           mkdir -p Payload
           find ./UCA_Mobile.iOS/bin -maxdepth 6 -name "*.app" -exec cp -r {} Payload/ \;

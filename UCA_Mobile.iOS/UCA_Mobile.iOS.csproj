@@ -13,5 +13,12 @@
   <ItemGroup>
     <ProjectReference Include="..\UCA_Mobile\UCA_Mobile.csproj" />
   </ItemGroup>
+  <PropertyGroup>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CodesignRequireProvisioningProfile>false</CodesignRequireProvisioningProfile>
+    <_RequireCodeSigning>false</_RequireCodeSigning>
+  </PropertyGroup>
+  
 </Project>
+
 
