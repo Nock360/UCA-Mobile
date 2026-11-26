@@ -28,17 +28,21 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - run: dotnet workload install ios
-      - name: Отключить ошибку версии Xcode на строке 2382
+      - name: Вырезать блок _ValidateXcodeVersion
         run: |
           python3 -c '
-          import glob
-          err_tag = chr(60) + "Error"
-          warn_tag = chr(60) + "Warning"
-          for p in glob.glob("/Users/runner/.dotnet/packs/Microsoft.iOS.Sdk*/*/targets/Xamarin.Shared.Sdk.targets"):
-              lines = open(p, encoding="utf-8").readlines()
-              for i in range(2365, min(2400, len(lines))):
-                  lines[i] = lines[i].replace(err_tag, warn_tag)
-              open(p, "w", encoding="utf-8").writelines(lines)
+          import os, re
+          lt, gt = chr(60), chr(62)
+          pat = re.compile(lt + r"Target\s+Name=\"_ValidateXcodeVersion\"[\s\S]*?" + lt + r"/Target" + gt)
+          rep = lt + "Target Name=\"_ValidateXcodeVersion\" /" + gt
+          for base in ["/Users/runner/.dotnet", "/usr/local/share/dotnet"]:
+              for root, _, files in os.walk(base):
+                  if "Xamarin.Shared.Sdk.targets" in files:
+                      p = os.path.join(root, "Xamarin.Shared.Sdk.targets")
+                      s = open(p, encoding="utf-8").read()
+                      s2 = pat.sub(rep, s)
+                      open(p, "w", encoding="utf-8").write(s2)
+                      print("PATCHED:", p, s != s2)
           '
       - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64
       - name: Упаковка IPA
