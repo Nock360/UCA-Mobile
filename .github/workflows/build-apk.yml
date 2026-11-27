@@ -34,7 +34,7 @@ jobs:
           open(p, "w", encoding="utf-8").write(s)
           '
           touch ./gh-pages-out/wwwroot/.nojekyll
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: ./gh-pages-out/wwwroot
       - id: deployment
@@ -53,3 +53,4 @@ jobs:
         with:
           name: UCA_Mobile_Android_APK
           path: ./UCA_Mobile.Android/bin/Release/net10.0-android/**/*-Signed.apk
+
