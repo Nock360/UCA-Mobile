@@ -28,21 +28,27 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - run: dotnet workload install ios
-      - name: Вырезать блок _ValidateXcodeVersion
+      - name: Отключить блокировку Xcode вокруг строки 2382
         run: |
           python3 -c '
           import os, re
           lt, gt = chr(60), chr(62)
-          pat = re.compile(lt + r"Target\s+Name=\"_ValidateXcodeVersion\"[\s\S]*?" + lt + r"/Target" + gt)
-          rep = lt + "Target Name=\"_ValidateXcodeVersion\" /" + gt
+          t_open = lt + "Target "
+          t_close = lt + "/Target" + gt
           for base in ["/Users/runner/.dotnet", "/usr/local/share/dotnet"]:
               for root, _, files in os.walk(base):
                   if "Xamarin.Shared.Sdk.targets" in files:
                       p = os.path.join(root, "Xamarin.Shared.Sdk.targets")
                       s = open(p, encoding="utf-8").read()
-                      s2 = pat.sub(rep, s)
-                      open(p, "w", encoding="utf-8").write(s2)
-                      print("PATCHED:", p, s != s2)
+                      lines = s.splitlines(True)
+                      pos = sum(len(l) for l in lines[:2381])
+                      start = s.rfind(t_open, 0, pos)
+                      end = s.find(t_close, pos) + len(t_close)
+                      if start != -1 and end > len(t_close):
+                          header = s[start:s.find(gt, start) + 1]
+                          s = s[:start] + header + t_close + s[end:]
+                          open(p, "w", encoding="utf-8").write(s)
+                          print("Успешно отключено:", header)
           '
       - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64
       - name: Упаковка IPA

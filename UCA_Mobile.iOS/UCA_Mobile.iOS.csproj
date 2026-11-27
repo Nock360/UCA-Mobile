@@ -20,7 +20,9 @@
     <_RequireCodeSigning>false</_RequireCodeSigning>
   </PropertyGroup>
   
+  <Target Name="_DetectSigningIdentity" />
 </Project>
+
 
 
 
