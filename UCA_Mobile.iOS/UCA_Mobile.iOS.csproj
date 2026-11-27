@@ -21,7 +21,11 @@
   </PropertyGroup>
   
   <Target Name="_DetectSigningIdentity" />
+  <PropertyGroup>
+    <UseInterpreter>true</UseInterpreter>
+  </PropertyGroup>
 </Project>
+
 
 
 
