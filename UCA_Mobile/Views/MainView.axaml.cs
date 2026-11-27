@@ -31,9 +31,9 @@ namespace UCA_Mobile.Views
         private Image MobilePlotImage = new() { Stretch = Stretch.Uniform };
         private TextBlock PlotCaption = new() { Text = "График", HorizontalAlignment = HorizontalAlignment.Center, FontSize = 12 };
         private Image GeneratedImageView = new() { Stretch = Stretch.Uniform };
-        private TextBox PyCodeBox = new() { IsReadOnly = true, MinHeight = 100, FontFamily = new FontFamily("Consolas"), FontSize = 12 };
-        private TextBox CppCodeBox = new() { IsReadOnly = true, MinHeight = 100, FontFamily = new FontFamily("Consolas"), FontSize = 12 };
-        private TextBox InoCodeBox = new() { IsReadOnly = true, MinHeight = 100, FontFamily = new FontFamily("Consolas"), FontSize = 12 };
+        private TextBox PyCodeBox = new() { IsReadOnly = true, MinHeight = 100, FontFamily = FontFamily.Default, FontSize = 12 };
+        private TextBox CppCodeBox = new() { IsReadOnly = true, MinHeight = 100, FontFamily = FontFamily.Default, FontSize = 12 };
+        private TextBox InoCodeBox = new() { IsReadOnly = true, MinHeight = 100, FontFamily = FontFamily.Default, FontSize = 12 };
         private TextBox ServerUrlBox = new() { Text = new UriBuilder("http", "127.0.0.1", 11434, "api/generate").Uri.ToString(), FontSize = 13 }; private TextBox CloudApiKeyBox = new() { Watermark = "Опционально: API-ключ (Groq / OpenRouter) для работы с 4G без ПК", FontSize = 12 };
         private StackPanel HintsListPanel = new() { Spacing = 6 };
 
@@ -267,9 +267,9 @@ namespace UCA_Mobile.Views
         {
             try
             {
-                var fn = expr.Compile("x");
+                Func<double, double> evalFn = x => { try { return (double)expr.Compile("x").Call(x).Real; } catch { return (double)expr.Substitute("x", x).EvalNumerical().Real; } };
                 var xs = Enumerable.Range(0, 200).Select(i => -10.0 + i * 0.1).ToArray();
-                var ys = xs.Select(x => { double y = 0; try { y = (double)fn.Call(x).Real; } catch { } return double.IsNaN(y) || double.IsInfinity(y) ? 0 : Math.Clamp(y, -50, 50); }).ToArray();
+                var ys = xs.Select(x => { double y = 0; try { y = evalFn(x); } catch { } return double.IsNaN(y) || double.IsInfinity(y) ? 0 : Math.Clamp(y, -50, 50); }).ToArray();
                 DrawSkiaChart(xs, ys, $"График функции: y = {expr}");
             }
             catch { }
@@ -464,6 +464,7 @@ namespace UCA_Mobile.Views
         }
     }
 }
+
 
 
 
