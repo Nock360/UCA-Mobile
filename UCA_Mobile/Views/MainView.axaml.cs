@@ -37,12 +37,12 @@ namespace UCA_Mobile.Views
         private TextBox ServerUrlBox = new() { Text = new UriBuilder("http", "127.0.0.1", 11434, "api/generate").Uri.ToString(), FontSize = 13 }; private TextBox CloudApiKeyBox = new() { Watermark = "Опционально: API-ключ (Groq / OpenRouter) для работы с 4G без ПК", FontSize = 12 };
         private StackPanel HintsListPanel = new() { Spacing = 6 };
 
-        public MainView()
+                public MainView()
         {
-            BuildMobileLayout();
-            InitPersistentSettings();
-            PopulateHints();
-            this.AttachedToVisualTree += (_, _) => ComputeInput("sin(x) * cos(x/2)");
+            try { BuildMobileLayout(); } catch (Exception ex) { Content = new TextBlock { Text = "UI Error: " + ex.Message, TextWrapping = TextWrapping.Wrap }; return; }
+            try { InitPersistentSettings(); } catch { }
+            try { PopulateHints(); } catch { }
+            this.AttachedToVisualTree += (_, _) => { try { ComputeInput("sin(x) * cos(x/2)"); } catch (Exception ex) { AnswerText.Text = ex.Message; } };
         }
                 private static readonly string MobileConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "uca_mobile_settings.json");
 
@@ -464,6 +464,7 @@ namespace UCA_Mobile.Views
         }
     }
 }
+
 
 
 
