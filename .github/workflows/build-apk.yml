@@ -1,11 +1,45 @@
-﻿name: Build UCA Mobile (Android & iOS)
+﻿name: Build UCA Mobile (Web, Android & iOS)
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
+  deploy-web:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet workload install wasm-tools
+      - run: dotnet publish ./UCA_Mobile.Browser/UCA_Mobile.Browser.csproj -c Release -o ./gh-pages-out
+      - name: Подготовка путей для GitHub Pages
+        run: |
+          python3 -c '
+          lt, gt = chr(60), chr(62)
+          p = "./gh-pages-out/wwwroot/index.html"
+          s = open(p, encoding="utf-8").read()
+          s = s.replace(lt + "base href=\"/\" /" + gt, lt + "base href=\"/UCA-Mobile/\" /" + gt)
+          s = s.replace(lt + "base href=\"/\"" + gt, lt + "base href=\"/UCA-Mobile/\"" + gt)
+          open(p, "w", encoding="utf-8").write(s)
+          '
+          touch ./gh-pages-out/wwwroot/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./gh-pages-out/wwwroot
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
   build-android:
     runs-on: ubuntu-latest
     steps:
@@ -19,44 +53,3 @@ jobs:
         with:
           name: UCA_Mobile_Android_APK
           path: ./UCA_Mobile.Android/bin/Release/net10.0-android/**/*-Signed.apk
-
-  build-ios:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-      - run: dotnet workload install ios
-      - name: Отключить блокировку Xcode вокруг строки 2382
-        run: |
-          python3 -c '
-          import os, re
-          lt, gt = chr(60), chr(62)
-          t_open = lt + "Target "
-          t_close = lt + "/Target" + gt
-          for base in ["/Users/runner/.dotnet", "/usr/local/share/dotnet"]:
-              for root, _, files in os.walk(base):
-                  if "Xamarin.Shared.Sdk.targets" in files:
-                      p = os.path.join(root, "Xamarin.Shared.Sdk.targets")
-                      s = open(p, encoding="utf-8").read()
-                      lines = s.splitlines(True)
-                      pos = sum(len(l) for l in lines[:2381])
-                      start = s.rfind(t_open, 0, pos)
-                      end = s.find(t_close, pos) + len(t_close)
-                      if start != -1 and end > len(t_close):
-                          header = s[start:s.find(gt, start) + 1]
-                          s = s[:start] + header + t_close + s[end:]
-                          open(p, "w", encoding="utf-8").write(s)
-                          print("Успешно отключено:", header)
-          '
-      - run: dotnet build ./UCA_Mobile.iOS/UCA_Mobile.iOS.csproj -c Release -f net10.0-ios -r ios-arm64
-      - name: Упаковка IPA
-        run: |
-          mkdir -p Payload
-          find ./UCA_Mobile.iOS/bin -maxdepth 6 -name "*.app" -exec cp -r {} Payload/ \;
-          zip -r UCA_Mobile.ipa Payload
-      - uses: actions/upload-artifact@v4
-        with:
-          name: UCA_Mobile_iOS_IPA
-          path: ./UCA_Mobile.ipa
