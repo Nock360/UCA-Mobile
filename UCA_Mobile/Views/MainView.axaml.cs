@@ -267,7 +267,7 @@ namespace UCA_Mobile.Views
         {
             try
             {
-                Func<double, double> evalFn = x => { try { return (double)expr.Compile("x").Call(x).Real; } catch { return (double)expr.Substitute("x", x).EvalNumerical().RealPart; } };
+                Func<double, double> evalFn = x => { try { return (double)expr.Compile("x").Call(x).Real; } catch { return (double)expr.Substitute("x", x).EvalNumerical().RealPartPart; } };
                 var xs = Enumerable.Range(0, 200).Select(i => -10.0 + i * 0.1).ToArray();
                 var ys = xs.Select(x => { double y = 0; try { y = evalFn(x); } catch { } return double.IsNaN(y) || double.IsInfinity(y) ? 0 : Math.Clamp(y, -50, 50); }).ToArray();
                 DrawSkiaChart(xs, ys, $"График функции: y = {expr}");
@@ -464,6 +464,7 @@ namespace UCA_Mobile.Views
         }
     }
 }
+
 
 
 
