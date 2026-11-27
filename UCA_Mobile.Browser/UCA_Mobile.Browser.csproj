@@ -8,6 +8,11 @@
     <ProjectReference Include="..\UCA_Mobile\UCA_Mobile.csproj" />
     <TrimmerRootAssembly Include="UCA_Mobile" />
     <TrimmerRootAssembly Include="AngouriMath" />
+    <TrimmerRootAssembly Include="Antlr4.Runtime.Standard" />
+    <TrimmerRootAssembly Include="PeterO.Numbers" />
+    <TrimmerRootAssembly Include="HonkSharp" />
+    <TrimmerRootAssembly Include="GenericTensor" />
     <TrimmerRootAssembly Include="Newtonsoft.Json" />
+    <TrimmerRootAssembly Include="SkiaSharp" />
   </ItemGroup>
 </Project>
