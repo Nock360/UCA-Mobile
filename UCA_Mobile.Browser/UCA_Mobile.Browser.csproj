@@ -2,12 +2,12 @@
   <PropertyGroup>
     <TargetFramework>net10.0-browser</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TrimmerRootAssembly Include="UCA_Mobile" />
-    <TrimmerRootAssembly Include="AngouriMath" />
-    <TrimmerRootAssembly Include="Newtonsoft.Json" />
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Browser" />
     <ProjectReference Include="..\UCA_Mobile\UCA_Mobile.csproj" />
+    <TrimmerRootAssembly Include="UCA_Mobile" />
+    <TrimmerRootAssembly Include="AngouriMath" />
+    <TrimmerRootAssembly Include="Newtonsoft.Json" />
   </ItemGroup>
 </Project>
